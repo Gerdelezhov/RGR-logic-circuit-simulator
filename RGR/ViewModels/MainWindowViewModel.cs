@@ -3,12 +3,15 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Input;
 using RGR.Models;
+using RGR.Views.Shapes;
 using ReactiveUI;
 using System.Collections.Generic;
 
 namespace RGR.ViewModels {
     public class Log {
         static readonly List<string> logs = new();
+        // static readonly string path = "../../../Log.txt";
+        // static bool first = true;
 
         public static MainWindowViewModel? Mwvm { private get; set; }
         public static void Write(string message, bool without_update = false) {
@@ -18,6 +21,10 @@ namespace RGR.ViewModels {
 
                 if (Mwvm != null) Mwvm.Logg = string.Join('\n', logs);
             }
+
+            // if (first) File.WriteAllText(path, message + "\n");
+            // else File.AppendAllText(path, message + "\n");
+            // first = false;
         }
     }
 
@@ -29,15 +36,23 @@ namespace RGR.ViewModels {
 
         public MainWindowViewModel() {
             Log.Mwvm = this;
+
+            /* Так не работает :/
+            var app = Application.Current;
+            if (app == null) return; // Такого не бывает
+            var life = (IClassicDesktopStyleApplicationLifetime?) app.ApplicationLifetime;
+            if (life == null) return; // Такого не бывает
+            foreach (var w in life.Windows) Log.Write("Window: " + w);
+            Log.Write("Windows: " + life.Windows.Count); */
         }
 
         public void AddWindow(Window mw) {
             var canv = mw.Find<Canvas>("Canvas");
-            if (canv == null) return;
+            if (canv == null) return; // Такого не бывает
             this.canv = canv;
 
             var panel = (Panel?) canv.Parent;
-            if (panel == null) return;
+            if (panel == null) return; // Такого не бывает
 
             panel.PointerPressed += (object? sender, PointerPressedEventArgs e) => {
                 if (e.Source != null && e.Source is Control @control) map.Press(@control, e.GetCurrentPoint(canv).Position);
@@ -47,13 +62,26 @@ namespace RGR.ViewModels {
             };
             panel.PointerReleased += (object? sender, PointerReleasedEventArgs e) => {
                 if (e.Source != null && e.Source is Control @control) {
-                    var pos = e.GetCurrentPoint(canv).Position;
-                    map.Release(@control, pos);
+                    int mode = map.Release(@control, e.GetCurrentPoint(canv).Position);
+                    bool tap = map.tapped;
+                    if (tap && mode == 1) {
+                        var pos = map.tap_pos;
+                        if (canv == null) return; // Такого не бывает
+
+                        var newy = map.GenSelectedItem();
+                        var size = newy.GetSize() / 2;
+                        newy.Move(pos - new Point(size.Width, size.Height));
+                        canv.Children.Add(newy.GetSelf());
+                        map.AddItem(newy);
+                    }
                 }
             };
             panel.PointerWheelChanged += (object? sender, PointerWheelEventArgs e) => {
                 if (e.Source != null && e.Source is Control @control) map.WheelMove(@control, e.Delta.Y);
             };
         }
+
+        public IGate[] ItemTypes { get => map.item_types; }
+        public int SelectedItem { get => map.SelectedItem; set => map.SelectedItem = value; }
     }
 }
