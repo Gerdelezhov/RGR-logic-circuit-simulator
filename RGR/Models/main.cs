@@ -7,8 +7,9 @@ using System.Collections.Generic;
 
 namespace RGR.Models {
     public class main {
-
-        //Выборка элементов
+        /*
+         * Выборка элементов
+         */
 
         private int selected_item = 0;
         public int SelectedItem { get => selected_item; set => selected_item = value; }
@@ -30,9 +31,11 @@ namespace RGR.Models {
 
         public IGate GenSelectedItem() => CreateItem(selected_item);
 
-        //Хранилище
+        /*
+         * Хранилище
+         */
 
-        List<IGate> items = new();
+        readonly List<IGate> items = new();
         public void AddItem(IGate item) {
             items.Add(item);
         }
@@ -40,7 +43,9 @@ namespace RGR.Models {
             items.Remove(item);
         }
 
-        //Определение режима перемещения
+        /*
+         * Определение режима перемещения
+         */
 
         int mode = 0;
         /*
@@ -48,6 +53,8 @@ namespace RGR.Models {
          * 0 - ничего не делает
          * 1 - двигаем камеру
          * 2 - двигаем элемент
+         * 3 - тянем элемент
+         * 4 - вышвыриваем элемент
         */
 
         private void CalcMode(Control item) {
@@ -55,33 +62,39 @@ namespace RGR.Models {
             mode = c switch {
                 "Scene" => 1,
                 "Body" => 2,
+                "Resizer" => 3,
+                "Deleter" => 4,
                 "Pin" or _ => 0,
             };
         }
 
-        private UserControl? GetUC(Control item) {
+        private static UserControl? GetUC(Control item) {
             while (item.Parent != null) {
                 if (item is UserControl @UC) return @UC;
                 item = (Control) item.Parent;
             }
             return null;
         }
-        private IGate? GetGate(Control item) {
+        private static IGate? GetGate(Control item) {
             var UC = GetUC(item);
             if (UC is IGate @gate) return @gate;
             return null;
         }
 
-        //Обработка мыши
+        /*
+         * Обработка мыши
+         */
 
         Point moved_pos;
         IGate? moved_item;
         Point item_old_pos;
+        Size item_old_size;
 
         public bool tapped = false; // Обрабатывается после Release
         public Point tap_pos; // Обрабатывается после Release
 
         public void Press(Control item, Point pos) {
+            // Log.Write("PointerPressed: " + item.GetType().Name + " pos: " + pos);
 
             CalcMode(item);
             Log.Write("new_mode: " + mode);
@@ -92,7 +105,9 @@ namespace RGR.Models {
             if (moved_item != null) item_old_pos = moved_item.GetPos();
 
             switch (mode) {
-            case 2:
+            case 3:
+                if (moved_item == null) break;
+                item_old_size = moved_item.GetBodySize();
                 break;
             }
 
@@ -113,6 +128,11 @@ namespace RGR.Models {
                 var new_pos = item_old_pos + delta;
                 moved_item.Move(new_pos);
                 break;
+            case 3:
+                if (moved_item == null) break;
+                var new_size = item_old_size + new Size(delta.X, delta.Y);
+                moved_item.Resize(new_size);
+                break;
             }
         }
 
@@ -130,6 +150,11 @@ namespace RGR.Models {
         private void Tapped(Control item, Point pos) {
             Log.Write("Tapped: " + item.GetType().Name + " pos: " + pos);
             tap_pos = pos;
+
+            if (mode == 4 && moved_item != null) {
+                RemoveItem(moved_item);
+                ((Control) moved_item).Remove();
+            }
         }
 
         public void WheelMove(Control item, double move) {

@@ -9,7 +9,7 @@
         Icon="/Assets/my-logo.ico"
         Title="RGR">
 
-   <Design.DataContext>
+    <Design.DataContext>
         <vm:MainWindowViewModel/>
     </Design.DataContext>
 

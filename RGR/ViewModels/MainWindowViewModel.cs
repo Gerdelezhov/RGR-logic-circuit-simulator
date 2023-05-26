@@ -34,7 +34,7 @@ namespace RGR.ViewModels {
         readonly main map = new();
         public string Logg { get => log; set => this.RaiseAndSetIfChanged(ref log, value); }
 
-        public MainWindowViewModel() {
+        public MainWindowViewModel() { // Если я буду Window mw передавать через этот конструктор, то предварительный просмотр снова порвёт смачно XD
             Log.Mwvm = this;
 
             /* Так не работает :/
