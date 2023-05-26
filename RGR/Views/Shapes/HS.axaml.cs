@@ -3,9 +3,9 @@ using Avalonia.Controls;
 using System.ComponentModel;
 
 namespace RGR.Views.Shapes {
-    public partial class AND_2: GateBase, IGate, INotifyPropertyChanged {
+    public partial class HS: GateBase, IGate, INotifyPropertyChanged {
         protected override int CountIns => 2;
-        protected override int CountOuts => 1;
+        protected override int CountOuts => 2;
         public override UserControl GetSelf() => this;
         protected override IGate GetSelfI => this;
 
@@ -33,7 +33,8 @@ namespace RGR.Views.Shapes {
             return new Point[][] {
                 new Point[] { new(X, Y), new(X + PinWidth, Y) }, // Первый вход
                 new Point[] { new(X, Y2), new(X + PinWidth, Y2) }, // Второй вход
-                new Point[] { new(X2, Y_m), new(X2 + PinWidth, Y_m) }, // Единственный выход
+                new Point[] { new(X2, Y), new(X2 + PinWidth, Y) }, // Первый выход
+                new Point[] { new(X2, Y2), new(X2 + PinWidth, Y2) }, // Второй выход
             };
         } }
     }

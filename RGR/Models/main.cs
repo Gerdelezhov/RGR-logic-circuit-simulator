@@ -24,8 +24,10 @@ namespace RGR.Models {
         private static IGate CreateItem(int n) {
             return n switch {
                 0 => new AND_2(),
-                1 => new AND_2(),
-                2 => new AND_2(),
+                1 => new OR_2(),
+                2 => new NOT(),
+                3 => new XOR_2(),
+                4 => new HS(),
                 _ => new AND_2(),
             };
         }
@@ -34,6 +36,8 @@ namespace RGR.Models {
             CreateItem(0),
             CreateItem(1),
             CreateItem(2),
+            CreateItem(3),
+            CreateItem(4),
         };
 
         public IGate GenSelectedItem() => CreateItem(selected_item);
@@ -68,7 +72,7 @@ namespace RGR.Models {
          * 8 - тянем уже существующее соединение - переподключаем
         */
 
-        private int CalcMode(string? tag) {
+        private static int CalcMode(string? tag) {
             if (tag == null) return 0;
             return tag switch {
                 "Scene" => 1,
@@ -121,8 +125,6 @@ namespace RGR.Models {
         bool delete_join = false;
 
         public void Press(Control item, Point pos) {
-            // Log.Write("PointerPressed: " + item.GetType().Name + " pos: " + pos);
-
             UpdateMode(item);
             Log.Write("new_mode: " + mode);
 
@@ -138,7 +140,7 @@ namespace RGR.Models {
                 break;
             case 5 or 6 or 7:
                 if (marker_circle == null) break;
-                var gate = GetGate(marker_circle) ?? throw new Exception("main.cs 141");
+                var gate = GetGate(marker_circle) ?? throw new Exception("main.cs 143");
                 start_dist = gate.GetPin(marker_circle, FindCanvas());
 
                 var circle_pos = start_dist.GetPos();
@@ -179,7 +181,7 @@ namespace RGR.Models {
             foreach (var logic in items) {
                 var item = (Control) logic;
                 var tb = item.TransformedBounds;
-                if (tb != null && tb.Value.Bounds.TransformToAABB(tb.Value.Transform).Contains(pos) && (string?) item.Tag != "Join") res = item; // Гениально! Апгрейд прошёл успешно :D
+                if (tb != null && tb.Value.Bounds.TransformToAABB(tb.Value.Transform).Contains(pos) && (string?) item.Tag != "Join") res = item;
                 FixItem(ref res, pos, item.GetLogicalChildren());
             }
         }
@@ -199,7 +201,7 @@ namespace RGR.Models {
             string[] mods = new[] { "In", "Out", "IO" };
             var tag = (string?) item.Tag;
             if (IsMode(item, mods) && item is Ellipse @ellipse
-                && !(marker_mode == 5 && tag == "In" || marker_mode == 6 && tag == "Out")) { // Hе даёт подключить вход ко входу, либо выход к выходу
+                && !(marker_mode == 5 && tag == "In" || marker_mode == 6 && tag == "Out")) { //Hе даёт подключить вход ко входу, либо выход к выходу
 
                 if (marker_circle != null && marker_circle != @ellipse) { // На случай моментального перехода курсором с одного кружка на другой
                     marker_circle.Fill = new SolidColorBrush(Color.Parse("#0000"));
@@ -252,12 +254,11 @@ namespace RGR.Models {
 
         public int Release(Control item, Point pos) {
             Move(item, pos);
-
             switch (mode) {
             case 5 or 6 or 7:
                 if (start_dist == null) break;
                 if (marker_circle != null) {
-                    var gate = GetGate(marker_circle) ?? throw new Exception("main.cs 260"); // Такого не бывает
+                    var gate = GetGate(marker_circle) ?? throw new Exception("main.cs 263");
                     var end_dist = gate.GetPin(marker_circle, FindCanvas());
                     var newy = new JoinedItems(start_dist, end_dist);
                     new_join = newy.line;
@@ -269,7 +270,7 @@ namespace RGR.Models {
                 if (old_join == null) break;
                 JoinedItems.arrow_to_join.TryGetValue(old_join, out var @join);
                 if (marker_circle != null && @join != null) {
-                    var gate = GetGate(marker_circle) ?? throw new Exception("main.cs 272"); // Такого не бывает
+                    var gate = GetGate(marker_circle) ?? throw new Exception("main.cs 275");
                     var p = gate.GetPin(marker_circle, FindCanvas());
                     @join.Delete();
 

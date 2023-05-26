@@ -9,7 +9,6 @@ using System.Collections.Generic;
 namespace RGR.ViewModels {
     public class Log {
         static readonly List<string> logs = new();
-
         public static MainWindowViewModel? Mwvm { private get; set; }
         public static void Write(string message, bool without_update = false) {
             if (!without_update) {
@@ -32,12 +31,12 @@ namespace RGR.ViewModels {
 
         public void AddWindow(Window mw) {
             var canv = mw.Find<Canvas>("Canvas");
-            if (canv == null) return; // Такого не бывает
+            if (canv == null) return;
 
             canv.Children.Add(map.Marker);
 
             var panel = (Panel?) canv.Parent;
-            if (panel == null) return; // Такого не бывает
+            if (panel == null) return;
 
             panel.PointerPressed += (object? sender, PointerPressedEventArgs e) => {
                 if (e.Source != null && e.Source is Control @control) map.Press(@control, e.GetCurrentPoint(canv).Position);
@@ -51,7 +50,7 @@ namespace RGR.ViewModels {
                     bool tap = map.tapped;
                     if (tap && mode == 1) {
                         var pos = map.tap_pos;
-                        if (canv == null) return; // Такого не бывает
+                        if (canv == null) return;
 
                         var newy = map.GenSelectedItem();
                         var size = newy.GetSize() / 2;
