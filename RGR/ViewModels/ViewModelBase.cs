@@ -1,8 +1,6 @@
 ﻿using ReactiveUI;
 
-namespace RGR.ViewModels
-{
-    public class ViewModelBase : ReactiveObject
-    {
+namespace RGR.ViewModels {
+    public class ViewModelBase: ReactiveObject {
     }
 }
