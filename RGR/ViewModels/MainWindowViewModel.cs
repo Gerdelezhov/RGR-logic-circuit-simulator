@@ -9,9 +9,6 @@ using System.Collections.Generic;
 namespace RGR.ViewModels {
     public class Log {
         static readonly List<string> logs = new();
-        // static readonly string path = "../../../Log.txt";
-        // static bool first = true;
-
         public static MainWindowViewModel? Mwvm { private get; set; }
         public static void Write(string message, bool without_update = false) {
             if (!without_update) {
@@ -20,40 +17,26 @@ namespace RGR.ViewModels {
 
                 if (Mwvm != null) Mwvm.Logg = string.Join('\n', logs);
             }
-
-            // if (first) File.WriteAllText(path, message + "\n");
-            // else File.AppendAllText(path, message + "\n");
-            // first = false;
         }
     }
 
     public class MainWindowViewModel: ViewModelBase {
         private string log = "";
-        // Canvas canv = new();
         readonly main map = new();
         public string Logg { get => log; set => this.RaiseAndSetIfChanged(ref log, value); }
 
-        public MainWindowViewModel() { // Если я буду Window mw передавать через этот конструктор, то предварительный просмотр снова порвёт смачно XD
+        public MainWindowViewModel() {
             Log.Mwvm = this;
-
-            /* Так не работает :/
-            var app = Application.Current;
-            if (app == null) return; // Такого не бывает
-            var life = (IClassicDesktopStyleApplicationLifetime?) app.ApplicationLifetime;
-            if (life == null) return; // Такого не бывает
-            foreach (var w in life.Windows) Log.Write("Window: " + w);
-            Log.Write("Windows: " + life.Windows.Count); */
         }
 
         public void AddWindow(Window mw) {
             var canv = mw.Find<Canvas>("Canvas");
-            if (canv == null) return; // Такого не бывает
-            // this.canv = canv;
+            if (canv == null) return;
 
             canv.Children.Add(map.Marker);
 
             var panel = (Panel?) canv.Parent;
-            if (panel == null) return; // Такого не бывает
+            if (panel == null) return;
 
             panel.PointerPressed += (object? sender, PointerPressedEventArgs e) => {
                 if (e.Source != null && e.Source is Control @control) map.Press(@control, e.GetCurrentPoint(canv).Position);
@@ -67,7 +50,7 @@ namespace RGR.ViewModels {
                     bool tap = map.tapped;
                     if (tap && mode == 1) {
                         var pos = map.tap_pos;
-                        if (canv == null) return; // Такого не бывает
+                        if (canv == null) return;
 
                         var newy = map.GenSelectedItem();
                         var size = newy.GetSize() / 2;

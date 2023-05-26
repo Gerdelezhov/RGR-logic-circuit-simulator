@@ -23,7 +23,7 @@ namespace RGR.Views.Shapes {
             List<Ellipse> list = new();
             foreach (var logic in LogicalChildren[0].LogicalChildren)
                 if (logic is Ellipse @ellipse) list.Add(@ellipse);
-            if (list.Count != count) throw new Exception("Чё?!"); // У этой фигуры всегда count пинов
+            if (list.Count != count) throw new Exception("GateBase 26");
             pins = list.ToArray();
 
             joins = new JoinedItems?[count];
@@ -77,8 +77,8 @@ namespace RGR.Views.Shapes {
                 double R = BodyRadius.BottomLeft;
                 double num = R - R / Math.Sqrt(2);
                 return new Thickness[] {
-                new(0, 0, num, num), // Картинка с удалителем
-                new(num, 0, 0, num), // Картинка с переместителем
+                new(0, 0, num, num), // Картинка удаление
+                new(num, 0, 0, num), // Картинка изменение размера
             };
         } }
 
@@ -103,7 +103,6 @@ namespace RGR.Views.Shapes {
 #pragma warning restore CS0108
 
         protected void RecalcSizes() {
-            // Log.Write("Size: " + width + " " + height);
             PropertyChanged?.Invoke(this, new(nameof(EllipseSize)));
             PropertyChanged?.Invoke(this, new(nameof(BodyStrokeSize)));
             PropertyChanged?.Invoke(this, new(nameof(EllipseStrokeSize)));
@@ -168,7 +167,7 @@ namespace RGR.Views.Shapes {
 
         public Point GetPinPos(int n, Visual? ref_point) {
             var pin = pins[n];
-            return pin.Center(ref_point); // Смотрите Utils ;'-} Там круто сделан метод
+            return pin.Center(ref_point);
         }
     }
 }
