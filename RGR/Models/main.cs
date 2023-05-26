@@ -24,8 +24,10 @@ namespace RGR.Models {
         private static IGate CreateItem(int n) {
             return n switch {
                 0 => new AND_2(),
-                1 => new AND_2(),
-                2 => new AND_2(),
+                1 => new OR_2(),
+                2 => new NOT(),
+                3 => new XOR_2(),
+                4 => new HS(),
                 _ => new AND_2(),
             };
         }
@@ -34,6 +36,8 @@ namespace RGR.Models {
             CreateItem(0),
             CreateItem(1),
             CreateItem(2),
+            CreateItem(3),
+            CreateItem(4),
         };
 
         public IGate GenSelectedItem() => CreateItem(selected_item);
@@ -68,7 +72,7 @@ namespace RGR.Models {
          * 8 - тянем уже существующее соединение - переподключаем
         */
 
-        private int CalcMode(string? tag) {
+        private static int CalcMode(string? tag) {
             if (tag == null) return 0;
             return tag switch {
                 "Scene" => 1,
@@ -138,7 +142,7 @@ namespace RGR.Models {
                 break;
             case 5 or 6 or 7:
                 if (marker_circle == null) break;
-                var gate = GetGate(marker_circle) ?? throw new Exception("main.cs 141");
+                var gate = GetGate(marker_circle) ?? throw new Exception("Чё?!"); // Такого не бывает
                 start_dist = gate.GetPin(marker_circle, FindCanvas());
 
                 var circle_pos = start_dist.GetPos();
@@ -177,13 +181,17 @@ namespace RGR.Models {
         }
         public void FixItem(ref Control res, Point pos, IEnumerable<ILogical> items) {
             foreach (var logic in items) {
+                // if (item.IsPointerOver) { } Гениальная вещь! ;'-} Хотя не, всё равно блокируется после Press и до Release, чего я впринципе хочу избежать ;'-}
                 var item = (Control) logic;
                 var tb = item.TransformedBounds;
+                // if (tb != null && new Rect(tb.Value.Clip.TopLeft, new Size()).Sum(item.Bounds).Contains(pos) && (string?) item.Tag != "Join") res = item; // Гениально! ;'-} НАКОНЕЦ-ТО ЗАРАБОТАЛО! (Так было в 8 лабе)
                 if (tb != null && tb.Value.Bounds.TransformToAABB(tb.Value.Transform).Contains(pos) && (string?) item.Tag != "Join") res = item; // Гениально! Апгрейд прошёл успешно :D
                 FixItem(ref res, pos, item.GetLogicalChildren());
             }
         }
         public void Move(Control item, Point pos) {
+            // Log.Write("PointerMoved: " + item.GetType().Name + " pos: " + pos);
+
             if (mode == 5 || mode == 6 || mode == 7 || mode == 8) {
                 var canv = FindCanvas();
                 if (canv != null) {
@@ -199,7 +207,7 @@ namespace RGR.Models {
             string[] mods = new[] { "In", "Out", "IO" };
             var tag = (string?) item.Tag;
             if (IsMode(item, mods) && item is Ellipse @ellipse
-                && !(marker_mode == 5 && tag == "In" || marker_mode == 6 && tag == "Out")) { // Hе даёт подключить вход ко входу, либо выход к выходу
+                && !(marker_mode == 5 && tag == "In" || marker_mode == 6 && tag == "Out")) { // То самое место, что не даёт подключить вход ко входу, либо выход к выходу
 
                 if (marker_circle != null && marker_circle != @ellipse) { // На случай моментального перехода курсором с одного кружка на другой
                     marker_circle.Fill = new SolidColorBrush(Color.Parse("#0000"));
@@ -215,6 +223,12 @@ namespace RGR.Models {
             }
 
             if (mode == 8) delete_join = (string?) item.Tag == "Deleter";
+
+            /* if (mode == 0 && (string?) item.Tag == "Join") { DEBUG
+                JoinedItems.arrow_to_join.TryGetValue((Line) item, out var @join);
+                if (@join != null) Log.Write("J a->b: id" + items.IndexOf(@join.A.parent) + " n:" + @join.A.num + "    id" + items.IndexOf(@join.B.parent) + " n:" + @join.B.num);
+            }*/
+
 
 
             var delta = pos - moved_pos;
@@ -252,13 +266,16 @@ namespace RGR.Models {
 
         public int Release(Control item, Point pos) {
             Move(item, pos);
+            // Log.Write("PointerReleased: " + item.GetType().Name + " pos: " + pos);
 
             switch (mode) {
             case 5 or 6 or 7:
                 if (start_dist == null) break;
                 if (marker_circle != null) {
-                    var gate = GetGate(marker_circle) ?? throw new Exception("main.cs 260"); // Такого не бывает
+                    var gate = GetGate(marker_circle) ?? throw new Exception("Чё?!"); // Такого не бывает
                     var end_dist = gate.GetPin(marker_circle, FindCanvas());
+                    // Log.Write("Стартовый элемент: " + start_dist.parent + " (" + start_dist.GetPos() + ")");
+                    // Log.Write("Конечный  элемент: " + end_dist.parent   + " (" + end_dist.GetPos()   + ")");
                     var newy = new JoinedItems(start_dist, end_dist);
                     new_join = newy.line;
                 }
@@ -269,7 +286,7 @@ namespace RGR.Models {
                 if (old_join == null) break;
                 JoinedItems.arrow_to_join.TryGetValue(old_join, out var @join);
                 if (marker_circle != null && @join != null) {
-                    var gate = GetGate(marker_circle) ?? throw new Exception("main.cs 272"); // Такого не бывает
+                    var gate = GetGate(marker_circle) ?? throw new Exception("Чё?!"); // Такого не бывает
                     var p = gate.GetPin(marker_circle, FindCanvas());
                     @join.Delete();
 
@@ -294,6 +311,7 @@ namespace RGR.Models {
         }
 
         private void Tapped(Control item, Point pos) {
+            // Log.Write("Tapped: " + item.GetType().Name + " pos: " + pos);
             tap_pos = pos;
 
             if (mode == 4 && moved_item != null) {
@@ -304,6 +322,7 @@ namespace RGR.Models {
         }
 
         public void WheelMove(Control item, double move) {
+            // Log.Write("WheelMoved: " + item.GetType().Name + " delta: " + (move > 0 ? 1 : -1));
         }
     }
 }
