@@ -1,6 +1,8 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
+using Avalonia.Media;
+using Avalonia.Threading;
 using RGR.Models;
 using System;
 using System.Collections.Generic;
@@ -8,8 +10,8 @@ using System.ComponentModel;
 
 namespace RGR.Views.Shapes {
     public abstract class GateBase: UserControl {
-        protected abstract int CountIns { get; }
-        protected abstract int CountOuts { get; }
+        public abstract int CountIns { get; }
+        public abstract int CountOuts { get; }
         public abstract UserControl GetSelf();
         protected abstract IGate GetSelfI { get; }
         protected abstract void Init();
@@ -23,7 +25,7 @@ namespace RGR.Views.Shapes {
             List<Ellipse> list = new();
             foreach (var logic in LogicalChildren[0].LogicalChildren)
                 if (logic is Ellipse @ellipse) list.Add(@ellipse);
-            if (list.Count != count) throw new Exception("Чё?!"); // У этой фигуры всегда count пинов
+            if (list.Count != count) throw new Exception("GateBase.cs 28");
             pins = list.ToArray();
 
             joins = new JoinedItems?[count];
@@ -46,9 +48,8 @@ namespace RGR.Views.Shapes {
         public Size GetSize() => new(Width, Height);
         public Size GetBodySize() => new(width, height);
 
-        /*
-         * Обработка размеров внутренностей
-         */
+
+        // Обработка размеров внутренностей
 
         protected readonly double base_size = 25;
         protected double width = 30 * 3; // Размеры тела, а не всего UserControl
@@ -77,8 +78,8 @@ namespace RGR.Views.Shapes {
                 double R = BodyRadius.BottomLeft;
                 double num = R - R / Math.Sqrt(2);
                 return new Thickness[] {
-                new(0, 0, num, num), // Картинка с удалителем
-                new(num, 0, 0, num), // Картинка с переместителем
+                new(0, 0, num, num), // Картинка удаления
+                new(num, 0, 0, num), // Картинка изменения размера
             };
         } }
 
@@ -103,7 +104,6 @@ namespace RGR.Views.Shapes {
 #pragma warning restore CS0108
 
         protected void RecalcSizes() {
-            // Log.Write("Size: " + width + " " + height);
             PropertyChanged?.Invoke(this, new(nameof(EllipseSize)));
             PropertyChanged?.Invoke(this, new(nameof(BodyStrokeSize)));
             PropertyChanged?.Invoke(this, new(nameof(EllipseStrokeSize)));
@@ -120,9 +120,8 @@ namespace RGR.Views.Shapes {
             PropertyChanged?.Invoke(this, new(nameof(ImageMargins)));
         }
 
-        /*
-         * Обработка соединений
-         */
+
+        // Обработка соединений
 
         protected JoinedItems?[] joins;
 
@@ -137,11 +136,13 @@ namespace RGR.Views.Shapes {
                 joins[n]?.Delete();
                 joins[n] = join;
             }
+            skip_upd = false;
         }
 
         public void RemoveJoin(JoinedItems join) {
             if (join.A.parent == this) joins[join.A.num] = null;
             if (join.B.parent == this) joins[join.B.num] = null;
+            skip_upd = false;
         }
 
         public void UpdateJoins(bool global) {
@@ -153,22 +154,87 @@ namespace RGR.Views.Shapes {
             foreach (var join in joins) join?.Delete();
         }
 
-        /*
-         * Обработка пинов
-         */
+        public void SetJoinColor(int o_num, bool value) {
+            var join = joins[o_num + CountIns];
+            if (join != null)
+                Dispatcher.UIThread.InvokeAsync(() => {
+                    join.line.Stroke = value ? Brushes.Lime : Brushes.DarkGray;
+                });
+        }
 
+
+        // Обработка пинов
         public Distantor GetPin(Ellipse finded, Visual? ref_point) {
             int n = 0;
             foreach (var pin in pins) {
                 if (pin == finded) return new(GetSelfI, n, ref_point, (string?) finded.Tag ?? "");
                 n++;
             }
-            throw new Exception("Так не бывает");
+            throw new Exception("GateBase.cs 173");
         }
 
         public Point GetPinPos(int n, Visual? ref_point) {
             var pin = pins[n];
-            return pin.Center(ref_point); // Смотрите Utils ;'-} Там круто сделан метод
+            return pin.Center(ref_point);
+        }
+
+        // Мозги
+
+
+        bool skip_upd = true;
+        public void LogicUpdate(Dictionary<IGate, Meta> ids, Meta me) {
+            if (skip_upd) return;
+            skip_upd = true;
+
+            int ins = CountIns;
+            for (int i = 0; i < ins; i++) {
+                var join = joins[i];
+                if (join == null) { me.ins[i] = 0; continue; }
+
+                if (join.A.parent == this) {
+                    var item = join.B;
+                    if (item.tag == "Out" || item.tag == "IO") {
+                        var p = item.parent;
+                        Meta meta = ids[p];
+                        me.ins[i] = meta.outs[item.num - p.CountIns];
+                    }
+                }
+                if (join.B.parent == this) {
+                    var item = join.A;
+                    if (item.tag == "Out" || item.tag == "IO") {
+                        var p = item.parent;
+                        Meta meta = ids[p];
+                        me.ins[i] = meta.outs[item.num - p.CountIns];
+                    }
+                }
+            }
+        }
+
+
+        //Экспорт
+        public abstract int TypeId { get; }
+
+        public object Export() {
+            return new Dictionary<string, object> {
+                ["id"] = TypeId,
+                ["pos"] = GetPos(),
+                ["size"] = GetSize()
+            };
+        }
+
+        public List<object[]> ExportJoins(Dictionary<IGate, int> to_num) {
+            List<object[]> res = new();
+            int n = 0, ins = CountIns;
+            foreach (var join in joins) {
+                if (++n > ins) break;
+                if (join == null) continue;
+                Distantor a = join.A, b = join.B;
+                res.Add(new object[] {
+                    to_num[a.parent], a.num,
+                    to_num[b.parent], b.num
+                });
+            }
+            return res;
         }
     }
 }

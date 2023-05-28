@@ -4,8 +4,10 @@ using System.ComponentModel;
 
 namespace RGR.Views.Shapes {
     public partial class NOT: GateBase, IGate, INotifyPropertyChanged {
-        protected override int CountIns => 1;
-        protected override int CountOuts => 1;
+        public override int TypeId => 1;
+
+        public override int CountIns => 1;
+        public override int CountOuts => 1;
         public override UserControl GetSelf() => this;
         protected override IGate GetSelfI => this;
 
@@ -29,5 +31,11 @@ namespace RGR.Views.Shapes {
                 new Point[] { new(X2, Y), new(X2 + PinWidth, Y) }, // Единственный выход
             };
         } }
+
+        /*
+         * Мозги
+         */
+
+        public void Brain(ref bool[] ins, ref bool[] outs) => outs[0] = !ins[0];
     }
 }
