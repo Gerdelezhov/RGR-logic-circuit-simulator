@@ -19,6 +19,7 @@ namespace RGR.ViewModels {
 
                 if (Mwvm != null) Mwvm.Logg = string.Join('\n', logs);
             }
+
         }
     }
 
@@ -43,7 +44,7 @@ namespace RGR.ViewModels {
             panel.PointerPressed += (object? sender, PointerPressedEventArgs e) => {
                 if (e.Source != null && e.Source is Control @control) map.Press(@control, e.GetCurrentPoint(canv).Position);
             };
-                        if (canv == null) return;
+            panel.PointerMoved += (object? sender, PointerEventArgs e) => {
                 if (e.Source != null && e.Source is Control @control) map.Move(@control, e.GetCurrentPoint(canv).Position);
             };
             panel.PointerReleased += (object? sender, PointerReleasedEventArgs e) => {

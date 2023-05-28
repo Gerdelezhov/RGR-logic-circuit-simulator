@@ -25,11 +25,7 @@ namespace RGR.Views.Shapes {
             List<Ellipse> list = new();
             foreach (var logic in LogicalChildren[0].LogicalChildren)
                 if (logic is Ellipse @ellipse) list.Add(@ellipse);
-<<<<<<< HEAD
-            if (list.Count != count) throw new Exception("GateBase 26");
-=======
             if (list.Count != count) throw new Exception("GateBase.cs 28");
->>>>>>> main-window
             pins = list.ToArray();
 
             joins = new JoinedItems?[count];
@@ -82,13 +78,8 @@ namespace RGR.Views.Shapes {
                 double R = BodyRadius.BottomLeft;
                 double num = R - R / Math.Sqrt(2);
                 return new Thickness[] {
-<<<<<<< HEAD
-                new(0, 0, num, num), // Картинка удаление
-                new(num, 0, 0, num), // Картинка изменение размера
-=======
                 new(0, 0, num, num), // Картинка удаления
                 new(num, 0, 0, num), // Картинка изменения размера
->>>>>>> main-window
             };
         } }
 
