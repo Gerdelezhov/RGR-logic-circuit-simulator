@@ -7,7 +7,8 @@
 		Width="1350" Height="730"
         x:Class="RGR.Views.MainWindow"
         Icon="/Assets/my-logo.ico"
-        Title="RGR">
+        Title="RGR"
+		FontFamily="Calibri">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
@@ -60,7 +61,7 @@
 			<Grid Background="#202123" Grid.Column="2" RowDefinitions="auto,*" DoubleTapped="DTapped">
 				<Border Classes="b" BorderBrush="#0d55f8" Background="#444654">
 					<Grid ColumnDefinitions="*,auto">
-						<TextBlock Background="#444654" Foreground="#b2b2b2" Tag="p_name" Text="{Binding ProjName}"/>
+						<TextBlock Background="#444654" Foreground="#b2b2b2" FontSize="16" Tag="p_name" Text="{Binding ProjName}"/>
 						<Button Grid.Column="1" Padding="2" Margin="6 -4 0 -4" Command="{Binding NewItem}">
 							<Image Width="24" Height="24" Source="/Assets/newitem.png"/>
 						</Button>
@@ -71,7 +72,7 @@
 						<DataTemplate>
 							<Border Margin="0 2 0 0" Classes="b" Background="#444654">
 								<Grid ColumnDefinitions="*,auto,auto,auto">
-									<TextBlock Text="{Binding}" Tag="{Binding}" Foreground="White" Background="#444654"/>
+									<TextBlock FontSize="16" Text="{Binding}" Tag="{Binding}" Foreground="White" Background="#444654"/>
 									<Button Grid.Column="1" Padding="2" Margin="6 -4 4 -4" Command="{Binding Open}" IsVisible="{Binding CanOpenMe}" Name="OpenScheme">
 										<Image Width="24" Height="24" Source="/Assets/Open.png"/>
 									</Button>

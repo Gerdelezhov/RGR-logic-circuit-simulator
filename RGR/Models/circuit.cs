@@ -18,7 +18,7 @@ namespace RGR.Models {
 
         public Scheme(Project p) { // Новая схема
             Created = Modified = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            Name = "Newy";
+            Name = "New";
             items = joins = Array.Empty<object>();
             states = "0";
             parent = p;

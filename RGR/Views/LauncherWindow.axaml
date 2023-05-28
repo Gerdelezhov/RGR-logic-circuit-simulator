@@ -8,7 +8,7 @@
         x:Class="RGR.Views.LauncherWindow"
         Icon="/Assets/my-logo.ico"
         Title="RGR"
-		Padding="8" Background="#444654"> 
+		Padding="8" Background="#444654" FontFamily="Calibri"> 
 
     <Design.DataContext>
         <vm:LauncherWindowViewModel/>
