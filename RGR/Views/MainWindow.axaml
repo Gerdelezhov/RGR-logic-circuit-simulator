@@ -31,43 +31,47 @@
 	</Window.Styles>
 
 	<DockPanel>
-		<Menu DockPanel.Dock="Top" ZIndex="10" Background="White">
-			<MenuItem Header="Файл">
-				<MenuItem Header="Создать новый проект" Command="{Binding Comm}" CommandParameter="Create"/>
-				<MenuItem Header="Открыть проект" Command="{Binding Comm}" CommandParameter="Open"/>
-				<MenuItem Header="Сохранить текущую схему" Command="{Binding Comm}" CommandParameter="Save" IsEnabled="{Binding CanSave}"/>
-				<MenuItem Header="Сохранить проект как..." Command="{Binding Comm}" CommandParameter="SaveAs"/>
-				<MenuItem Header="Выйти в лаунчер" Command="{Binding Comm}" CommandParameter="ExitToLauncher"/>
-				<MenuItem Header="Выйти" Command="{Binding Comm}" CommandParameter="Exit"/>
+		<Menu DockPanel.Dock="Top" ZIndex="10" Background="#343541">
+			<MenuItem Background="#444654" Header="Файл" Foreground="White">
+				<MenuItem Header="Создать новый проект" Background="#343541" Foreground="White" Command="{Binding Comm}" CommandParameter="Create"/>
+				<MenuItem Header="Открыть проект" Background="#343541" Foreground="White" Command="{Binding Comm}" CommandParameter="Open"/>
+				<MenuItem Header="Сохранить текущую схему" Background="#343541" Foreground="White" Command="{Binding Comm}" CommandParameter="Save" IsEnabled="{Binding CanSave}"/>
+				<MenuItem Header="Сохранить проект как..." Background="#343541" Foreground="White" Command="{Binding Comm}" CommandParameter="SaveAs"/>
+				<MenuItem Header="Выйти в лаунчер" Background="#343541" Foreground="White" Command="{Binding Comm}" CommandParameter="ExitToLauncher"/>
+				<MenuItem Header="Выйти" Background="#343541" Foreground="White" Command="{Binding Comm}" CommandParameter="Exit"/>
 			</MenuItem>
 		</Menu>
 		<Grid ColumnDefinitions="*,3*,*">
 			<Panel Grid.Column="1">
-				<TextBlock Text="{Binding Logg}" Background="AliceBlue"/>
+				<TextBlock Text="{Binding Logg}">
+					<TextBlock.Background>
+						<ImageBrush Source="/Assets/curcitBKG3.png" Stretch="None"/>
+					</TextBlock.Background>
+				</TextBlock>
 				<Canvas Tag="Scene" Name="Canvas" Background="#0000"/>
-			</Panel>
-			<ListBox Items="{Binding ItemTypes}" SelectedIndex="{Binding SelectedItem}" Name="Gates" VirtualizationMode="None">
+			</Panel> 
+			<ListBox Items="{Binding ItemTypes}" SelectedIndex="{Binding SelectedItem}" Name="Gates" VirtualizationMode="None" Background="#202123">
 				<ListBox.ItemTemplate>
 					<DataTemplate>
 						<ContentControl Content="{Binding}"/>
 					</DataTemplate>
 				</ListBox.ItemTemplate>
 			</ListBox>
-			<Grid Grid.Column="2" RowDefinitions="auto,*" DoubleTapped="DTapped">
-				<Border Classes="b" BorderBrush="#4df" Background="White">
+			<Grid Background="#202123" Grid.Column="2" RowDefinitions="auto,*" DoubleTapped="DTapped">
+				<Border Classes="b" BorderBrush="#0d55f8" Background="#444654">
 					<Grid ColumnDefinitions="*,auto">
-						<TextBlock Tag="p_name" Text="{Binding ProjName}"/>
+						<TextBlock Background="#444654" Foreground="#b2b2b2" Tag="p_name" Text="{Binding ProjName}"/>
 						<Button Grid.Column="1" Padding="2" Margin="6 -4 0 -4" Command="{Binding NewItem}">
 							<Image Width="24" Height="24" Source="/Assets/newitem.png"/>
 						</Button>
 					</Grid>
 				</Border>
-				<ListBox Grid.Row="1" Padding="10 4 0 0" Items="{Binding Schemes}" VirtualizationMode="None">
+				<ListBox  Background="#202123" Grid.Row="1" Padding="10 4 0 0" Items="{Binding Schemes}" VirtualizationMode="None">
 					<ListBox.ItemTemplate>
 						<DataTemplate>
-							<Border Classes="b">
+							<Border Margin="0 2 0 0" Classes="b" Background="#444654">
 								<Grid ColumnDefinitions="*,auto,auto,auto">
-									<TextBlock Text="{Binding}" Tag="{Binding}"/>
+									<TextBlock Text="{Binding}" Tag="{Binding}" Foreground="White" Background="#444654"/>
 									<Button Grid.Column="1" Padding="2" Margin="6 -4 4 -4" Command="{Binding Open}" IsVisible="{Binding CanOpenMe}" Name="OpenScheme">
 										<Image Width="24" Height="24" Source="/Assets/Open.png"/>
 									</Button>

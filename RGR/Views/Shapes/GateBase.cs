@@ -316,7 +316,7 @@ namespace RGR.Views.Shapes {
             var joins = joins_out[o_num];
             Dispatcher.UIThread.InvokeAsync(() => {
                 foreach(var join in joins)
-                    join.line.Stroke = value ? Brushes.Lime : Brushes.DarkGray;
+                    join.line.Stroke = value ? Brushes.MediumSeaGreen : Brushes.DarkGray;
             });
         }
 
