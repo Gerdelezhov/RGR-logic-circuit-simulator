@@ -1,5 +1,4 @@
 ﻿using Avalonia.Controls;
-using RGR.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -22,7 +21,7 @@ namespace RGR.Models {
             Name = "Новый проект";
             Created = Modified = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             FileDir = null;
-            FileName = null; // FileHandler.GetProjectFileName();
+            FileName = null;
             CreateScheme();
         }
 
@@ -94,7 +93,7 @@ namespace RGR.Models {
 
         public int CompareTo(object? obj) {
             if (obj is not Project proj) throw new ArgumentNullException(nameof(obj));
-            return (int)(proj.Modified - Modified); // Не поддерживает long :///
+            return (int)(proj.Modified - Modified);
         }
 
         public override string ToString() {
@@ -113,5 +112,11 @@ namespace RGR.Models {
             Save();
             parent.AppendProject(this);
         }
+
+        /*
+         * Для тестирования
+         */
+
+        public void SetDir(string path) => FileDir = path;
     }
 }

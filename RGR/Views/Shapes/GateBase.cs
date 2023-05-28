@@ -50,14 +50,8 @@ namespace RGR.Views.Shapes {
             CountIns = ins;
             CountOuts = outs + ios;
 
-            /* double sizer = sides.Select(x => x.Length).Max();
-            double vert_sizer = Math.Max(Math.Max(sides[0].Length, sides[3].Length), 3);
-            width = 30 * (2 + Math.Min(sizer, vert_sizer) / 2);
-            height = Math.Max(30 * (2 + sizer / 2), (9 + 32) * 2 / 3 * (1.5 + 0.75 * CountIns.Max(CountOuts)));*/
             width = MinW; height = MinH;
             if (height < width) height = width;
-            // AvaloniaXamlLoader.Load(GetSelf()); // InitializeComponent(); Не вышло :///
-            // А так от Init бы полностью отказался бы ;'-} Принцип Подскановки Лископ бы просто пылал от этого, хоть абстрактному классу и положено зависеть от потомка ;'-}
             DataContext = GetSelf();
             Init(); // :///
 
@@ -90,13 +84,11 @@ namespace RGR.Views.Shapes {
             MyRecalcSizes();
         }
 
-        /*
-         * Всё о размерах и позициях самого элемента ;'-}
-         */
+
+        //Всё о размерах и позициях самого элемента
 
         public void Move(Point pos, bool global = false) {
             Margin = new(pos.X - UC_Width / 2, pos.Y - UC_Height / 2, 0, 0);
-            // Log.Write("Пришла позиция: " + pos + " | а вышла: " + GetPos());
             UpdateJoins(global);
         }
 
@@ -127,9 +119,8 @@ namespace RGR.Views.Shapes {
         public Point GetPose() => pose;
         public Rect GetBounds() => new(Margin.Left, Margin.Top, UC_Width, UC_Height);
 
-        /*
-         * Обработка размеров внутренностей
-         */
+
+        // Обработка размеров внутренностей
 
         protected double base_size = 25;
         protected double width = 30 * 3; // Размеры тела, а не всего UserControl
@@ -156,8 +147,7 @@ namespace RGR.Views.Shapes {
         public Thickness ImageMargins { get {
             double R = BodyRadius.BottomLeft;
             double num = R - R / Math.Sqrt(2);
-            return new(0, 0, num, num); // Картинка с переместителем
-            // Картинка с удалителем ... устранена ;'-}
+            return new(0, 0, num, num); // Картинка изменения размера
         } }
 
 
@@ -169,9 +159,6 @@ namespace RGR.Views.Shapes {
             double min = EllipseSize + BaseFraction * 2;
             double pin_start = EllipseSize - EllipseStrokeSize / 2;
             double pin_width = base_size - EllipseSize + PinStrokeSize;
-            // .1.
-            // .1..2.
-            // .1..2..3.
             foreach (var side in Sides) {
                 n++;
                 double count = side.Length;
@@ -254,15 +241,10 @@ namespace RGR.Views.Shapes {
             var pin_stroke_size = PinStrokeSize;
             int n = 0;
             foreach (var line in line_arr) {
-                // Пришлось отказать от этих параметров из-за бага авалонии, т.к. в Bounds попадает мусор,
-                // т.е. весь путь, который линия проходит от начала координат своего предка НЕ помечается, как Margin,
-                // из-за чего подсоединение к элементам начинается сильно глючить, видя в теге Pin вместо In XD
-                // DevTools тоже обманывается, что это действительно границы линии, а не Margin :/
                 var A = pin_points[n][0];
                 var B = pin_points[n++][1];
 
                 line.StrokeThickness = pin_stroke_size;
-                // line.StartPoint = A;
                 line.Margin = new(A.X, A.Y, 0, 0);
                 line.EndPoint = B;
             }
@@ -279,9 +261,8 @@ namespace RGR.Views.Shapes {
             }
         }
 
-        /*
-         * Обработка соединений
-         */
+
+        // Обработка соединений
 
         protected JoinedItems?[] joins_in;
         protected List<JoinedItems>[] joins_out;
@@ -333,7 +314,7 @@ namespace RGR.Views.Shapes {
 
         public void SetJoinColor(int o_num, bool value) {
             var joins = joins_out[o_num];
-            Dispatcher.UIThread.InvokeAsync(() => { // Ох, знакомая головная боль с андроида, где даже Toast за пределами главного потока не вызовешь :/ XD :D
+            Dispatcher.UIThread.InvokeAsync(() => {
                 foreach(var join in joins)
                     join.line.Stroke = value ? Brushes.Lime : Brushes.DarkGray;
             });
@@ -346,9 +327,9 @@ namespace RGR.Views.Shapes {
             return false;
         }
 
-        /*
-         * Обработка пинов
-         */
+
+        // Обработка пинов
+
 
         public Distantor GetPin(Ellipse finded) {
             int n = 0;
@@ -359,31 +340,16 @@ namespace RGR.Views.Shapes {
             throw new Exception("Так не бывает");
         }
 
-        /* Внимание! TransformedBounds в принципе не обновляется, когда мне это надо, сколько бы времени
-         * не прошло, ПО ЭТОМУ высчет центра окружности через TransformedBounds отстаёт!
-         * По этому от метода Center, что я сделал в auxiliary, придётся отказаться XD
-         * 
-        protected override void OnPropertyChanged<T>(AvaloniaPropertyChangedEventArgs<T> change) {
-            base.OnPropertyChanged(change);
-            if (change.Property.Name == "TransformedBounds")
-                Log.Write("Что-то изменилось " + change.NewValue.Value);
-            else
-                Log.Write("Что-то изменилось " + change.Property.Name + " " + change.NewValue.Value);
-        }*/
-
         Thickness[] ellipse_margins = Array.Empty<Thickness>();
 
         public Point GetPinPos(int n) {
-            // var pin = pins[n];
-            // return pin.Center(ref_point); // Смотрите auxiliary ;'-} Там круто сделан метод (но он по факту и оказался причиной бага, т.к. TransformedBounds ОПАЗДЫВАААААЕЕЕЕЕЕЕЕЕЕЕЕЕЕТ!)
             var m = ellipse_margins[n];
             double R2 = EllipseSize / 2;
             return new Point(Margin.Left + m.Left + R2, Margin.Top + m.Top + R2);
         }
 
-        /*
-         * Мозги
-         */
+
+        // Мозгиы
 
         public int[][] GetPinData() => pin_data;
 
@@ -404,7 +370,6 @@ namespace RGR.Views.Shapes {
                         Meta meta = ids[p];
                         int[] data = p.GetPinData()[item.num];
                         me.ins[i] = meta.outs[data[1]];
-                        // Log.Write("ins: " + auxiliary.Obj2json(me.ins) + " | " + data[1]);
                     }
                 }
                 if (join.B.parent == this) {
@@ -414,15 +379,13 @@ namespace RGR.Views.Shapes {
                         Meta meta = ids[p];
                         int[] data = p.GetPinData()[item.num];
                         me.ins[i] = meta.outs[data[1]];
-                        // Log.Write("ins: " + auxiliary.Obj2json(me.ins) + " | " + data[1]);
                     }
                 }
             }
         }
 
-        /*
-         * Экспорт, но может быть прокачан в дочернем классе, если есть что добавить
-         */
+
+        // Экспорт
 
         public abstract int TypeId { get; }
 
@@ -489,7 +452,7 @@ namespace RGR.Views.Shapes {
             Log.Write(key + "-запись элемента не поддерживается");
         }
 
-        /* Для тестирования */
+        // Для тестирования
 
         public Ellipse SecretGetPin(int n) => pins[n];
     }

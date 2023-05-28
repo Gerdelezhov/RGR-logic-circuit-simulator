@@ -30,7 +30,6 @@ namespace RGR.Views.Shapes {
         bool my_state = false;
         Point? press_pos;
 
-        // Данная схема работает гораздо быстрее, чем событие Tapped ;'-} Из-за того, что не обрабатывается дополнительно DoubleTapped, что гасит второй Tapped + некоторые задержки
         private static Point GetPos(PointerEventArgs e) {
             if (e.Source is not Control src) return new();
             while ((string?) src.Tag != "scene" && src.Parent != null) src = (Control) src.Parent;

@@ -96,7 +96,7 @@ namespace RGR.Models {
         }
 
         /*
-         * Кнопочки
+         * Кнопки
          */
 
         void FuncOpen() {

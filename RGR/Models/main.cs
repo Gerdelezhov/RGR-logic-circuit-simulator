@@ -19,14 +19,8 @@ namespace RGR.Models {
         
         public Line Marker { get => marker; }
         public Rectangle Marker2 { get => marker2; }
-
-        readonly Simulator sim = new();
-
+        public readonly Simulator sim = new();
         public Canvas canv = new();
-
-        /*
-         * Маркер
-         */
 
         private IGate? marked_item;
         private JoinedItems? marked_line;
@@ -52,9 +46,8 @@ namespace RGR.Models {
             }
         }
 
-        /*
-         * Выборка элементов
-         */
+
+        // Выборка элементов
 
         private int selected_item = 0;
         public int SelectedItem { get => selected_item; set => selected_item = value; }
@@ -73,27 +66,16 @@ namespace RGR.Models {
             };
         }
 
+
         public IGate[] item_types = Enumerable.Range(0, 8).Select(CreateItem).ToArray();
 
         public IGate GenSelectedItem() => CreateItem(selected_item);
 
-        /*
-         * Хранилище
-         */
+
+        // Хранилище
 
         readonly List<IGate> items = new();
-        // readonly MatrixTransform general_transform = new() { Matrix = new(1.0, 0.0, 0.0, 1.0, 0, 0) };
-        // Canvas? itemer;
         private void AddToMap(IControl item) {
-            /*if (itemer == null) { Снова мимо :///
-                itemer = new Canvas();
-                var layout = new LayoutTransformControl() {
-                    LayoutTransform = general_transform,
-                    Child = itemer,
-                };
-                canv.Children.Add(layout);
-            }
-            itemer.Children.Add(item);*/
             canv.Children.Add(item);
         }
 
@@ -127,18 +109,16 @@ namespace RGR.Models {
             foreach (var item in items) item.SavePose();
         }
 
-        /*
-         * Определение режима перемещения
-         */
+        //Определение режима перемещения
+
 
         int mode = 0;
-        /*
-         *    Режимы:
-         * 0 - ничего не делает
+        //   Режимы:
+         /* 0 - ничего не делает
          * 1 - двигаем камеру
          * 2 - двигаем элемент
          * 3 - тянем элемент
-         * 4 - вышвыриваем элемент
+         * 4 - Удаляем элемент
          * 5 - тянем линию от входа (In)
          * 6 - тянем линию от выхода (Out)
          * 7 - тянем линию от узла (IO)
@@ -180,9 +160,8 @@ namespace RGR.Models {
             return null;
         }
 
-        /*
-         * Обработка мыши
-         */
+
+        // Обработка мыши
 
         Point moved_pos;
         IGate? moved_item;
@@ -197,11 +176,10 @@ namespace RGR.Models {
         bool join_start;
         bool delete_join = false;
 
-        public void Press(Control item, Point pos) {
-            // Log.Write("PointerPressed: " + item.GetType().Name + " pos: " + pos);
+        public bool lock_self_connect = true;
 
+        public void Press(Control item, Point pos) {
             UpdateMode(item);
-            // Log.Write("new_mode: " + mode);
 
             moved_pos = pos;
             moved_item = GetGate(item);
@@ -218,7 +196,7 @@ namespace RGR.Models {
                 break;
             case 5 or 6 or 7:
                 if (marker_circle == null) break;
-                var gate = GetGate(marker_circle) ?? throw new Exception("Чё?!"); // Такого не бывает
+                var gate = GetGate(marker_circle) ?? throw new Exception("main.cs 212");
                 start_dist = gate.GetPin(marker_circle);
 
                 var circle_pos = start_dist.GetPos();
@@ -255,43 +233,42 @@ namespace RGR.Models {
 
         public void FixItem(ref Control res, Point pos, IEnumerable<ILogical> items) {
             foreach (var logic in items) {
-                // if (item.IsPointerOver) { } Гениальная вещь! ;'-} Хотя не, всё равно блокируется после Press и до Release, чего я впринципе хочу избежать ;'-}
                 var item = (Control) logic;
                 var tb = item.TransformedBounds;
-                // if (tb != null && new Rect(tb.Value.Clip.TopLeft, new Size()).Sum(item.Bounds).Contains(pos) && (string?) item.Tag != "Join") res = item; // Гениально! ;'-} НАКОНЕЦ-ТО ЗАРАБОТАЛО! (Так было в 8 лабе)
-                if (tb != null && tb.Value.Bounds.TransformToAABB(tb.Value.Transform).Contains(pos) && (string?) item.Tag != "Join") res = item; // Гениально! Апгрейд прошёл успешно :D
+                if (tb != null && tb.Value.Bounds.TransformToAABB(tb.Value.Transform).Contains(pos) && (string?) item.Tag != "Join") res = item;
                 FixItem(ref res, pos, item.GetLogicalChildren());
             }
         }
-        public void Move(Control item, Point pos) {
-            // Log.Write("PointerMoved: " + item.GetType().Name + " pos: " + pos);
-
-            if (mode == 5 || mode == 6 || mode == 7 || mode == 8) {
+        public void Move(Control item, Point pos, bool use_fix = true) {
+            if (use_fix && (mode == 5 || mode == 6 || mode == 7 || mode == 8)) {
                 var tb = canv.TransformedBounds;
                 if (tb != null) {
                     item = new Canvas() { Tag = "Scene" };
                     var bounds = tb.Value.Bounds.TransformToAABB(tb.Value.Transform);
                     FixItem(ref item, pos + bounds.TopLeft, canv.Children);
-                    // Log.Write("tag: " + item.Tag);
                 }
             }
 
             string[] mods = new[] { "In", "Out", "IO" };
             var tag = (string?) item.Tag;
-            if (marker_circle != null) {
+            if (IsMode(item, mods) && item is Ellipse @ellipse
+                && !(marker_mode == 5 && tag == "In" || marker_mode == 6 && tag == "Out" ||
+                lock_self_connect && moved_item == GetGate(item))) { // Не даёт подключить вход ко входу, либо выход к выходу
+
+                if (marker_circle != null && marker_circle != @ellipse) { // На случай моментального перехода курсором с одного кружка на другой
+                    marker_circle.Fill = new SolidColorBrush(Color.Parse("#0000"));
+                    marker_circle.Stroke = Brushes.Gray;
+                }
+                marker_circle = @ellipse;
+                @ellipse.Fill = Brushes.Lime;
+                @ellipse.Stroke = Brushes.Green;
+            } else if (marker_circle != null) {
                 marker_circle.Fill = new SolidColorBrush(Color.Parse("#0000"));
                 marker_circle.Stroke = Brushes.Gray;
                 marker_circle = null;
             }
 
             if (mode == 8) delete_join = (string?) item.Tag == "Deleter";
-
-            /* if (mode == 0 && (string?) item.Tag == "Join") { DEBUG
-                JoinedItems.arrow_to_join.TryGetValue((Line) item, out var @join);
-                if (@join != null) Log.Write("J a->b: id" + items.IndexOf(@join.A.parent) + " n:" + @join.A.num + "    id" + items.IndexOf(@join.B.parent) + " n:" + @join.B.num);
-            }*/
-
-
 
             var delta = pos - moved_pos;
             if (delta.X == 0 && delta.Y == 0) return;
@@ -334,15 +311,13 @@ namespace RGR.Models {
         public bool tapped = false; // Обрабатывается после Release
         public Point tap_pos; // Обрабатывается после Release
 
-        public int Release(Control item, Point pos) {
-            Move(item, pos);
-            // Log.Write("PointerReleased: " + item.GetType().Name + " pos: " + pos);
-
+        public int Release(Control item, Point pos, bool use_fix = true) {
+            Move(item, pos, use_fix);
             switch (mode) {
             case 5 or 6 or 7:
                 if (start_dist == null) break;
                 if (marker_circle != null) {
-                    var gate = GetGate(marker_circle) ?? throw new Exception("Чё?!"); // Такого не бывает
+                    var gate = GetGate(marker_circle) ?? throw new Exception("main.cs 335");
                     var end_dist = gate.GetPin(marker_circle);
                     // Log.Write("Стартовый элемент: " + start_dist.parent + " (" + start_dist.GetPos() + ")");
                     // Log.Write("Конечный  элемент: " + end_dist.parent   + " (" + end_dist.GetPos()   + ")");
@@ -356,7 +331,7 @@ namespace RGR.Models {
                 if (old_join == null) break;
                 JoinedItems.arrow_to_join.TryGetValue(old_join, out var @join);
                 if (marker_circle != null && @join != null) {
-                    var gate = GetGate(marker_circle) ?? throw new Exception("Чё?!"); // Такого не бывает
+                    var gate = GetGate(marker_circle) ?? throw new Exception("main.cs 349");
                     var p = gate.GetPin(marker_circle);
                     @join.Delete();
 
@@ -382,13 +357,9 @@ namespace RGR.Models {
         }
 
         private void Tapped(Control item, Point pos) {
-            // Log.Write("Tapped: " + item.GetType().Name + " pos: " + pos);
             tap_pos = pos;
 
             switch (mode) {
-            /* case 4:
-                if (moved_item != null) RemoveItem(moved_item);
-                break; */
             case 2 or 8:
                 if (item is Line @line) {
                     if (!JoinedItems.arrow_to_join.TryGetValue(@line, out var @join)) break;
@@ -407,7 +378,6 @@ namespace RGR.Models {
         }
 
         public void WheelMove(Control item, double move, Point pos) {
-            // Log.Write("WheelMoved: " + item.GetType().Name + " delta: " + (move > 0 ? 1 : -1));
             int mode = CalcMode((string?) item.Tag);
             double scale = move > 0 ? 1.1 : 1 / 1.1;
             double inv_scale = 1 / scale;
@@ -435,7 +405,6 @@ namespace RGR.Models {
         }
 
         public void KeyPressed(Control _, Key key) {
-            // Log.Write("KeyPressed: " + item.GetType().Name + " key: " + key);
             switch (key) {
             case Key.Up:
             case Key.Left:
@@ -458,9 +427,8 @@ namespace RGR.Models {
         }
 
 
-        /*
-         * Экспорт и импорт
-         */
+
+        // Экспорт и импорт
 
         public readonly FileHandler filer = new();
         public Scheme? current_scheme;
@@ -476,17 +444,14 @@ namespace RGR.Models {
             List<object[]> joins = new();
             foreach (var item in items) joins.Add(item.ExportJoins(item_to_num));
 
+            sim.Clean();
             string states = sim.Export();
 
             try { current_scheme.Update(arr, joins.ToArray(), states); }
             catch (Exception e) { Log.Write("Save error:\n" + e); }
-
-            /* Log.Write("Items: " + auxiliary.Obj2json(arr));
-            Log.Write("Joins: " + auxiliary.Obj2json(joins));
-            Log.Write("States: " + auxiliary.Obj2json(states)); */
         }
 
-        public void ImportScheme() {
+        public void ImportScheme(bool start = true) {
             if (current_scheme == null) return;
 
             sim.Stop();
@@ -527,7 +492,7 @@ namespace RGR.Models {
 
             sim.Import(current_scheme.states);
             sim.lock_sim = false;
-            sim.Start();
+            if (start) sim.Start();
         }
     }
 }
