@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Dict name="Проверка" created="$1685303571" modified="$1685303657">
+	<schemes>
+		<List>
+			<Dict name="Схема_1" created="$1685303571" modified="$1685303657" states="0010">
+				<items>
+					<List>
+						<Dict id="$0" pos="$p$296,100" size="$s$71,71" base_size="$25"/>
+						<Dict id="$5" pos="$p$133,75" size="$s$71,71" base_size="$25" state="_BOOL_yeah"/>
+						<Dict id="$6" pos="$p$134,153" size="$s$71,71" base_size="$25"/>
+						<Dict id="$7" pos="$p$443,100" size="$s$71,71" base_size="$25" state="_BOOL_nop"/>
+					</List>
+				</items>
+				<joins>
+					<List>
+						<List _0='$3' _1='$0' _2='In' _3='$0' _4='$2' _5='Out'/>
+						<List _0='$1' _1='$0' _2='Out' _3='$0' _4='$0' _5='In'/>
+						<List _0='$2' _1='$0' _2='Out' _3='$0' _4='$1' _5='In'/>
+					</List>
+				</joins>
+			</Dict>
+		</List>
+	</schemes>
+</Dict>

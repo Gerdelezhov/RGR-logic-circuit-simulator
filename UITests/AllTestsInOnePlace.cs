@@ -134,7 +134,7 @@ namespace UITests {
             IGate? gate = Click(canv, 200, 200);
             Assert.NotNull(gate);
             var data = Export();
-            Assert.Equal("{\"name\": \"Newy\", \"created\": 123, \"modified\": 456, \"items\": [{\"id\": 0, \"pos\": \"$p$200,200\", \"size\": \"$s$71,71\", \"base_size\": 25}], \"joins\": [], \"states\": \"00\"}", data);
+            Assert.Equal("{\"name\": \"Новая схема\", \"created\": 123, \"modified\": 456, \"items\": [{\"id\": 0, \"pos\": \"$p$200,200\", \"size\": \"$s$71,71\", \"base_size\": 25}], \"joins\": [], \"states\": \"00\"}", data);
 
             SelectGate(3); // XOR-gate
             Task.Delay(1).GetAwaiter().GetResult();
@@ -145,7 +145,7 @@ namespace UITests {
             Move(gate.SecretGetPin(2), gate2.SecretGetPin(0)); // Соединяем gate и gate2
 
             data = Export();
-            Assert.Equal("{\"name\": \"Newy\", \"created\": 123, \"modified\": 456, \"items\": [{\"id\": 0, \"pos\": \"$p$200,200\", \"size\": \"$s$71,71\", \"base_size\": 25}, {\"id\": 3, \"pos\": \"$p$300,300\", \"size\": \"$s$71,71\", \"base_size\": 25}], \"joins\": [[0, 2, \"Out\", 1, 0, \"In\"]], \"states\": \"000\"}", data);
+            Assert.Equal("{\"name\": \"Новая схема\", \"created\": 123, \"modified\": 456, \"items\": [{\"id\": 0, \"pos\": \"$p$200,200\", \"size\": \"$s$71,71\", \"base_size\": 25}, {\"id\": 3, \"pos\": \"$p$300,300\", \"size\": \"$s$71,71\", \"base_size\": 25}], \"joins\": [[0, 2, \"Out\", 1, 0, \"In\"]], \"states\": \"000\"}", data);
 
             SelectGate(5); // Switch-gate
             Task.Delay(1).GetAwaiter().GetResult();
