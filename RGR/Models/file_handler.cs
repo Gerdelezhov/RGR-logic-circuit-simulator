@@ -21,8 +21,6 @@ namespace RGR.Models {
             LoadProjectList();
         }
 
-
-
         private void AddProject(Project proj) {
             if (proj.FileDir == null || proj.FileName == null) return;
 

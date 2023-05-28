@@ -20,33 +20,6 @@
 					</List>
 				</joins>
 			</Dict>
-			<Dict name="Sc2" created="$1685268849" modified="$1685270676" states="00111101">
-				<items>
-					<List>
-						<Dict id="$4" pos="$p$300,196" size="$s$71,71" base_size="$25"/>
-						<Dict id="$5" pos="$p$112,152" size="$s$71,71" base_size="$25" state="_BOOL_yeah"/>
-						<Dict id="$5" pos="$p$112,237" size="$s$71,71" base_size="$25" state="_BOOL_yeah"/>
-						<Dict id="$5" pos="$p$108,360" size="$s$71,71" base_size="$25" state="_BOOL_yeah"/>
-						<Dict id="$7" pos="$p$465,168" size="$s$71,71" base_size="$25" state="_BOOL_nop"/>
-						<Dict id="$7" pos="$p$466,240" size="$s$71,71" base_size="$25" state="_BOOL_yeah"/>
-						<Dict id="$4" pos="$p$407,350" size="$s$71,71" base_size="$25"/>
-						<Dict id="$7" pos="$p$527,315" size="$s$72,71" base_size="$25" state="_BOOL_nop"/>
-						<Dict id="$7" pos="$p$532,386" size="$s$71,71" base_size="$25" state="_BOOL_yeah"/>
-					</List>
-				</items>
-				<joins>
-					<List>
-						<List _0='$0' _1='$2' _2='Out' _3='$4' _4='$0' _5='In'/>
-						<List _0='$0' _1='$3' _2='Out' _3='$5' _4='$0' _5='In'/>
-						<List _0='$6' _1='$0' _2='In' _3='$0' _4='$3' _5='Out'/>
-						<List _0='$1' _1='$0' _2='Out' _3='$0' _4='$0' _5='In'/>
-						<List _0='$2' _1='$0' _2='Out' _3='$0' _4='$1' _5='In'/>
-						<List _0='$3' _1='$0' _2='Out' _3='$6' _4='$1' _5='In'/>
-						<List _0='$6' _1='$2' _2='Out' _3='$7' _4='$0' _5='In'/>
-						<List _0='$6' _1='$3' _2='Out' _3='$8' _4='$0' _5='In'/>
-					</List>
-				</joins>
-			</Dict>
 		</List>
 	</schemes>
 </Dict>

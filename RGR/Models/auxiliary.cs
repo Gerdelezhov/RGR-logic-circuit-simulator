@@ -9,22 +9,10 @@ using Avalonia.Media;
 using System.Text.Json;
 using RGR.ViewModels;
 using System.Collections;
-using System.Diagnostics;
 using System;
-using Avalonia.Controls.Shapes;
 
 namespace RGR.Models {
     public static class auxiliary {
-
-        public static string Base64Encode(string plainText) {
-            var plainTextBytes = Encoding.UTF8.GetBytes(plainText);
-            return System.Convert.ToBase64String(plainTextBytes);
-        }
-        public static string Base64Decode(string base64EncodedData) {
-            var base64EncodedBytes = System.Convert.FromBase64String(base64EncodedData);
-            return Encoding.UTF8.GetString(base64EncodedBytes);
-        }
-
         /*
          * JSON
          */
@@ -118,12 +106,9 @@ namespace RGR.Models {
                     return s;
                 case JsonValueKind.Number:
                     if (@item.ToString().Contains('.')) return @item.GetDouble();
-                    // Иначе это целое число
                     long a = @item.GetInt64();
                     int b = @item.GetInt32();
-                    // short c = @item.GetInt16();
                     if (a != b) return a;
-                    // if (b != c) return b;
                     return b;
                 case JsonValueKind.True: return true;
                 case JsonValueKind.False: return false;
@@ -210,7 +195,6 @@ namespace RGR.Models {
                     return List2XML(@item.EnumerateArray().Select(item => (object?) item).ToList(), level);
                 case JsonValueKind.String:
                     var s = XMLEscape(@item.GetString() ?? "null");
-                    // Log.Write("XS: '" + @item.GetString() + "' -> '" + s + "'");
                     return s;
                 case JsonValueKind.Number: return "$" + @item.ToString(); // escape NUM
                 case JsonValueKind.True: return "_BOOL_yeah";
@@ -292,60 +276,11 @@ namespace RGR.Models {
 
 
         /*
-         * Misc
+         * Остальное
          */
 
         public static string? Obj2xml(object? obj) => Json2xml(Obj2json(obj));
         public static object? Xml2obj(string xml) => Json2obj(Xml2json(xml));
-
-        public static void RenderToFile(Control target, string path) {
-            double w = target.Bounds.Width, h = target.Bounds.Height;
-            var pixelSize = new PixelSize((int) w, (int) h);
-            var size = new Size(w, h);
-            using RenderTargetBitmap bitmap = new(pixelSize);
-            target.Measure(size);
-            target.Arrange(new Rect(size));
-            bitmap.Render(target);
-            bitmap.Save(path);
-        }
-
-        public static string TrimAll(this string str) { // Убирает пробелы по бокам и повторы пробелов внутри
-            StringBuilder sb = new();
-            for (int i = 0; i < str.Length; i++) {
-                if (i > 0 && str[i] == ' ' && str[i - 1] == ' ') continue;
-                sb.Append(str[i]);
-            }
-            return sb.ToString().Trim();
-        }
-
-        public static string[] NormSplit(this string str) => str.TrimAll().Split(' ');
-
-        public static string GetStackInfo() {
-            var st = new StackTrace();
-            var sb = new StringBuilder();
-            for (int i = 1; i < 11; i++) {
-                var frame = st.GetFrame(i);
-                if (frame == null) continue;
-
-                var method = frame.GetMethod();
-                if (method == null || method.ReflectedType == null) continue;
-
-                sb.Append(method.ReflectedType.Name + " " + method.Name + " | ");
-                if (i == 5) sb.Append("\n    ");
-            }
-            return sb.ToString();
-        }
-
-        public static int Normalize(this int num, int min, int max) {
-            if (num < min) return min;
-            if (num > max) return max;
-            return num;
-        }
-        public static double Normalize(this double num, double min, double max) {
-            if (num < min) return min;
-            if (num > max) return max;
-            return num;
-        }
 
         public static double Hypot(this Point delta) {
             return Math.Sqrt(Math.Pow(delta.X, 2) + Math.Pow(delta.Y, 2));
