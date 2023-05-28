@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Dict name="Новый проект" created="$1685268664" modified="$1685268682">
+	<schemes>
+		<List>
+			<Dict name="Newy" created="$1685268696" modified="$1685268696" states="0">
+				<items>
+					<List/>
+				</items>
+				<joins>
+					<List/>
+				</joins>
+			</Dict>
+			<Dict name="Newy" created="$1685268849" modified="$1685268849" states="0">
+				<items>
+					<List/>
+				</items>
+				<joins>
+					<List/>
+				</joins>
+			</Dict>
+		</List>
+	</schemes>
+</Dict>

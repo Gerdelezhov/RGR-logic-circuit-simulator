@@ -15,5 +15,7 @@ namespace RGR.Views {
         public void DTapped(object? sender, Avalonia.Interactivity.RoutedEventArgs e) {
             mwvm.DTapped(sender, e);
         }
+
+        public void Update() => mwvm.Update();
     }
 }

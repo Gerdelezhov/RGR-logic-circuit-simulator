@@ -13,22 +13,31 @@ namespace RGR.Views.Shapes {
         public Point GetPos();
         public Size GetSize();
         public Size GetBodySize();
-        public void Move(Point pos);
-        public void Resize(Size size, bool global);
+        public void Move(Point pos, bool global = false);
+        public void Resize(Size size, bool global = false);
+        public void ChangeScale(double scale, bool global = false);
+        public void SavePose();
+        public Point GetPose();
+        public Rect GetBounds();
 
-        public Distantor GetPin(Ellipse finded, Visual? ref_point);
-        public Point GetPinPos(int n, Visual? ref_point);
+        public Distantor GetPin(Ellipse finded);
+        public Point GetPinPos(int n);
 
         public void AddJoin(JoinedItems join);
         public void RemoveJoin(JoinedItems join);
         public void ClearJoins();
         public void SetJoinColor(int o_num, bool value);
+        public bool ContainsJoin(JoinedItems join);
 
         public void Brain(ref bool[] ins, ref bool[] outs);
+        public int[][] GetPinData();
         public void LogicUpdate(Dictionary<IGate, Meta> ids, Meta me);
 
         public int TypeId { get; }
         public object Export();
         public List<object[]> ExportJoins(Dictionary<IGate, int> to_num);
+        public void Import(Dictionary<string, object> dict);
+
+        public Ellipse SecretGetPin(int n);
     }
 }
