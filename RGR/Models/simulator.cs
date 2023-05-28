@@ -156,6 +156,8 @@ namespace RGR.Models {
 
         public void TopSecretPublicTickMethod() => Tick();
 
+        // Для комплесного решения:
+
         public Switch[] GetSwitches() => items.Select(x => x.item).OfType<Switch>().ToArray();
         public LightBulb[] GetLightBulbs() => items.Select(x => x.item).OfType<LightBulb>().ToArray();
 

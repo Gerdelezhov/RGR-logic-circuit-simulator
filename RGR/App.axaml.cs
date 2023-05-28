@@ -19,6 +19,8 @@ namespace RGR {
         }
 
         private static void IncrementBuildNum() {
+            if (lock_inc_build) return;
+
             string path = "../../../../build.num";
             int num;
             try { num = int.Parse(File.ReadAllText(path)); }
@@ -26,5 +28,11 @@ namespace RGR {
             num++;
             File.WriteAllText(path, num.ToString());
         }
+
+        /*
+         * Для тестирования
+         */
+
+        public static bool lock_inc_build = false;
     }
 }

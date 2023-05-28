@@ -13,10 +13,8 @@ using System;
 
 namespace RGR.Models {
     public static class auxiliary {
-        /*
-         * JSON
-         */
 
+        // JSON
         public static string JsonEscape(string str) {
             StringBuilder sb = new();
             foreach (char i in str) {
@@ -131,10 +129,8 @@ namespace RGR.Models {
             return JsonHandler(data);
         }
 
-        /*
-         * XML
-         */
 
+        //XML
         public static string XMLEscape(string str) {
             StringBuilder sb = new();
             foreach (char i in str) {
@@ -275,10 +271,8 @@ namespace RGR.Models {
         public static string Xml2json(string xml) => ToJSONHandler(XElement.Parse(xml));
 
 
-        /*
-         * Остальное
-         */
 
+        //Остальное
         public static string? Obj2xml(object? obj) => Json2xml(Obj2json(obj));
         public static object? Xml2obj(string xml) => Json2obj(Xml2json(xml));
 

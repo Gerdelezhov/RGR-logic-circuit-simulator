@@ -18,7 +18,7 @@ namespace RGR.Models {
 
         public Scheme(Project p) { // Новая схема
             Created = Modified = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            Name = "New";
+            Name = "Newy";
             items = joins = Array.Empty<object>();
             states = "0";
             parent = p;
@@ -95,10 +95,8 @@ namespace RGR.Models {
             Update();
         }
 
-        /*
-         * Кнопки
-         */
 
+        // Кнопки
         void FuncOpen() {
             ViewModelBase.map.current_scheme = this;
             ViewModelBase.map.ImportScheme();
