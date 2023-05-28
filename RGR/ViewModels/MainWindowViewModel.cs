@@ -1,10 +1,12 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Input;
 using RGR.Models;
 using RGR.Views.Shapes;
 using ReactiveUI;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace RGR.ViewModels {
     public class Log {
@@ -41,7 +43,7 @@ namespace RGR.ViewModels {
             panel.PointerPressed += (object? sender, PointerPressedEventArgs e) => {
                 if (e.Source != null && e.Source is Control @control) map.Press(@control, e.GetCurrentPoint(canv).Position);
             };
-            panel.PointerMoved += (object? sender, PointerEventArgs e) => {
+                        if (canv == null) return;
                 if (e.Source != null && e.Source is Control @control) map.Move(@control, e.GetCurrentPoint(canv).Position);
             };
             panel.PointerReleased += (object? sender, PointerReleasedEventArgs e) => {
@@ -72,5 +74,43 @@ namespace RGR.ViewModels {
 
         public IGate[] ItemTypes { get => map.item_types; }
         public int SelectedItem { get => map.SelectedItem; set => map.SelectedItem = value; }
+
+        // Обработка панели со схемами проекта
+
+        Border? cur_border;
+        TextBlock? old_b_child;
+        readonly ObservableCollection<string> schemes = new() { "scheme_1", "scheme_lol", "scheme_boom" };
+
+        public ObservableCollection<string> Schemes { get => schemes; }
+
+
+
+        public void DTapped(object? sender, Avalonia.Interactivity.RoutedEventArgs e) {
+            Log.Write("DT: " + e.Source);
+            var src = (Control?) e.Source;
+
+            if (src is ContentPresenter cp && cp.Child is Border bord) src = bord;
+            if (src is Border bord2 && bord2.Child is TextBlock tb2) src = tb2;
+
+            if (src is not TextBlock tb) return;
+
+            var p = tb.Parent;
+            if (p == null || p is not Border b) return;
+
+            if (cur_border != null && old_b_child != null) cur_border.Child = old_b_child;
+            cur_border = b;
+            old_b_child = tb;
+
+            var newy = new TextBox { Text = tb.Text };
+            b.Child = newy;
+            newy.KeyUp += (object? sender, KeyEventArgs e) => {
+                if (e.Key != Key.Return) return;
+                tb.Text = newy.Text;
+                b.Child = tb;
+                cur_border = null; old_b_child = null;
+
+                map.Export();
+            };
+        }
     }
 }

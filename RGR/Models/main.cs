@@ -8,11 +8,14 @@ using DynamicData;
 using Avalonia.Controls.Shapes;
 using Avalonia.Media;
 using Avalonia.LogicalTree;
+using System.Linq;
 
 namespace RGR.Models {
     public class main {
         readonly Line marker = new() { Tag = "Marker", ZIndex = 2, IsVisible = false, Stroke = Brushes.YellowGreen, StrokeThickness = 3 };
         public Line Marker { get => marker; }
+
+        readonly Simulator sim = new();
 
         /*
          * Выборка элементов
@@ -49,9 +52,11 @@ namespace RGR.Models {
         readonly List<IGate> items = new();
         public void AddItem(IGate item) {
             items.Add(item);
+            sim.AddItem(item);
         }
         public void RemoveItem(IGate item) {
             items.Remove(item);
+            sim.RemoveItem(item);
         }
 
         /*
@@ -305,6 +310,26 @@ namespace RGR.Models {
         }
 
         public void WheelMove(Control item, double move) {
+        }
+
+        /*
+         * Экспорт и импорт
+         */
+
+        public void Export() {
+            var arr = items.Select(x => x.Export()).ToArray();
+
+            Dictionary<IGate, int> item_to_num = new();
+            int n = 0;
+            foreach (var item in items) item_to_num.Add(item, n++);
+            List<object[]> joins = new();
+            foreach (var item in items) joins.Add(item.ExportJoins(item_to_num));
+
+            bool[] states = sim.Export();
+
+            Log.Write("Items: " + auxiliary.Obj2json(arr));
+            Log.Write("Joins: " + auxiliary.Obj2json(joins));
+            Log.Write("States: " + auxiliary.Obj2json(states));
         }
     }
 }
