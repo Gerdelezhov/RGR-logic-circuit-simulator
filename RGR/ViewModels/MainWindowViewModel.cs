@@ -91,16 +91,16 @@ namespace RGR.ViewModels {
         public static int SelectedItem { get => map.SelectedItem; set => map.SelectedItem = value; }
 
 
-        // Обработка той самой панели со схемами проекта
+        // Обработка панели со схемами проекта
 
         Grid? cur_grid;
         TextBlock? old_b_child;
         object? old_b_child_tag;
         string? prev_scheme_name;
 
-        public string ProjName { get => CurrentProj == null ? "???" : CurrentProj.Name; }
+        public static string ProjName { get => CurrentProj == null ? "???" : CurrentProj.Name; }
 
-        public ObservableCollection<Scheme> Schemes { get => CurrentProj == null ? new() : CurrentProj.schemes; }
+        public static ObservableCollection<Scheme> Schemes { get => CurrentProj == null ? new() : CurrentProj.schemes; }
 
 
 
@@ -127,13 +127,13 @@ namespace RGR.ViewModels {
             prev_scheme_name = tb.Text;
 
             var newy = new TextBox { Text = tb.Text };
+
             cur_grid.Children[0] = newy;
 
             newy.KeyUp += (object? sender, KeyEventArgs e) => {
                 if (e.Key != Key.Return) return;
 
                 if (newy.Text != prev_scheme_name) {
-                    // tb.Text = newy.Text;
                     if ((string?) tb.Tag == "p_name") CurrentProj?.ChangeName(newy.Text);
                     else if (old_b_child_tag is Scheme scheme) scheme.ChangeName(newy.Text);
                 }
@@ -144,6 +144,8 @@ namespace RGR.ViewModels {
         }
 
         public void Update() {
+            //Log.Write("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n    Текущий проект:\n" + CurrentProj);
+
             map.ImportScheme();
 
             this.RaisePropertyChanged(new(nameof(ProjName)));
@@ -152,11 +154,10 @@ namespace RGR.ViewModels {
             if (mw != null) mw.Width++;
         }
 
-        public bool CanSave { get => CurrentProj != null && CurrentProj.CanSave(); }
+        public static bool CanSave { get => CurrentProj != null && CurrentProj.CanSave(); }
 
 
-        // Кнопочки!
-
+        // Кнопки
         public void FuncComm(string Comm) {
             switch (Comm) {
             case "Create":
@@ -174,6 +175,8 @@ namespace RGR.ViewModels {
                 break;
             case "Save":
                 map.Export();
+                // Для создания тестов:
+                File.WriteAllText("../../../for_test.json", auxiliary.Obj2json((map.current_scheme ?? throw new System.Exception("Чё?!")).Export()));
                 break;
             case "SaveAs":
                 map.Export();
@@ -192,10 +195,12 @@ namespace RGR.ViewModels {
 
         public ReactiveCommand<string, Unit> Comm { get; }
 
-        private void FuncNewItem() {
+        private static void FuncNewItem() {
             CurrentProj?.AddScheme(null);
         }
 
         public ReactiveCommand<Unit, Unit> NewItem { get; }
+
+        public static bool LockSelfConnect { get => map.lock_self_connect; set => map.lock_self_connect = value; }
     }
 }

@@ -50,7 +50,7 @@ namespace RGR.Views.Shapes {
         public void Brain(ref bool[] ins, ref bool[] outs) => outs[0] = my_state;
 
         /*
-         * Кастомный экспорт и импорт
+         * Экспорт и импорт
          */
 
         public override Dictionary<string, object> ExtraExport() => new() { ["state"] = my_state };

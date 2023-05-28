@@ -109,16 +109,16 @@ namespace RGR.Models {
             foreach (var item in items) item.SavePose();
         }
 
+
         //Определение режима перемещения
-
-
         int mode = 0;
-        //   Режимы:
-         /* 0 - ничего не делает
+        /*
+         *    Режимы:
+         * 0 - ничего не делает
          * 1 - двигаем камеру
          * 2 - двигаем элемент
          * 3 - тянем элемент
-         * 4 - Удаляем элемент
+         * 4 - вышвыриваем элемент
          * 5 - тянем линию от входа (In)
          * 6 - тянем линию от выхода (Out)
          * 7 - тянем линию от узла (IO)
@@ -162,7 +162,6 @@ namespace RGR.Models {
 
 
         // Обработка мыши
-
         Point moved_pos;
         IGate? moved_item;
         Point item_old_pos;
@@ -255,7 +254,7 @@ namespace RGR.Models {
                 && !(marker_mode == 5 && tag == "In" || marker_mode == 6 && tag == "Out" ||
                 lock_self_connect && moved_item == GetGate(item))) { // Не даёт подключить вход ко входу, либо выход к выходу
 
-                if (marker_circle != null && marker_circle != @ellipse) { // На случай моментального перехода курсором с одного кружка на другой
+                if (marker_circle != null && marker_circle != @ellipse) {
                     marker_circle.Fill = new SolidColorBrush(Color.Parse("#0000"));
                     marker_circle.Stroke = Brushes.Gray;
                 }
@@ -317,10 +316,8 @@ namespace RGR.Models {
             case 5 or 6 or 7:
                 if (start_dist == null) break;
                 if (marker_circle != null) {
-                    var gate = GetGate(marker_circle) ?? throw new Exception("main.cs 335");
+                    var gate = GetGate(marker_circle) ?? throw new Exception("main.cs 319");
                     var end_dist = gate.GetPin(marker_circle);
-                    // Log.Write("Стартовый элемент: " + start_dist.parent + " (" + start_dist.GetPos() + ")");
-                    // Log.Write("Конечный  элемент: " + end_dist.parent   + " (" + end_dist.GetPos()   + ")");
                     var newy = new JoinedItems(start_dist, end_dist);
                     AddToMap(newy.line);
                 }
@@ -331,7 +328,7 @@ namespace RGR.Models {
                 if (old_join == null) break;
                 JoinedItems.arrow_to_join.TryGetValue(old_join, out var @join);
                 if (marker_circle != null && @join != null) {
-                    var gate = GetGate(marker_circle) ?? throw new Exception("main.cs 349");
+                    var gate = GetGate(marker_circle) ?? throw new Exception("main.cs 331");
                     var p = gate.GetPin(marker_circle);
                     @join.Delete();
 
@@ -429,7 +426,6 @@ namespace RGR.Models {
 
 
         // Экспорт и импорт
-
         public readonly FileHandler filer = new();
         public Scheme? current_scheme;
 

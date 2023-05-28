@@ -49,7 +49,6 @@ namespace RGR.Views.Shapes {
             pin_data = pin_d.ToArray();
             CountIns = ins;
             CountOuts = outs + ios;
-
             width = MinW; height = MinH;
             if (height < width) height = width;
             DataContext = GetSelf();
@@ -85,8 +84,7 @@ namespace RGR.Views.Shapes {
         }
 
 
-        //Всё о размерах и позициях самого элемента
-
+        // Всё о размерах и позициях  элемента
         public void Move(Point pos, bool global = false) {
             Margin = new(pos.X - UC_Width / 2, pos.Y - UC_Height / 2, 0, 0);
             UpdateJoins(global);
@@ -120,7 +118,7 @@ namespace RGR.Views.Shapes {
         public Rect GetBounds() => new(Margin.Left, Margin.Top, UC_Width, UC_Height);
 
 
-        // Обработка размеров внутренностей
+        //Обработка размеров внутренностей
 
         protected double base_size = 25;
         protected double width = 30 * 3; // Размеры тела, а не всего UserControl
@@ -147,7 +145,7 @@ namespace RGR.Views.Shapes {
         public Thickness ImageMargins { get {
             double R = BodyRadius.BottomLeft;
             double num = R - R / Math.Sqrt(2);
-            return new(0, 0, num, num); // Картинка изменения размера
+            return new(0, 0, num, num);
         } }
 
 
@@ -216,7 +214,6 @@ namespace RGR.Views.Shapes {
 #pragma warning restore CS0108
 
         protected void RecalcSizes() {
-            // Log.Write("Size: " + width + " " + height);
             PropertyChanged?.Invoke(this, new(nameof(BodyStrokeSize)));
             PropertyChanged?.Invoke(this, new(nameof(BodyMargin)));
             PropertyChanged?.Invoke(this, new(nameof(BodyWidth)));
@@ -276,10 +273,8 @@ namespace RGR.Views.Shapes {
                     if (data[0] == 0) {
                         joins_in[n]?.Delete();
                         joins_in[n] = join;
-                        // Log.Write("AddIn: " + n);
                     } else {
                         joins_out[n].Add(join);
-                        // Log.Write("AddOut: " + n);
                     }
                 }
             }
@@ -316,7 +311,7 @@ namespace RGR.Views.Shapes {
             var joins = joins_out[o_num];
             Dispatcher.UIThread.InvokeAsync(() => {
                 foreach(var join in joins)
-                    join.line.Stroke = value ? Brushes.MediumSeaGreen : Brushes.DarkGray;
+                    join.line.Stroke = value ? Brushes.Lime : Brushes.DarkGray;
             });
         }
 
@@ -329,8 +324,6 @@ namespace RGR.Views.Shapes {
 
 
         // Обработка пинов
-
-
         public Distantor GetPin(Ellipse finded) {
             int n = 0;
             foreach (var pin in pins) {
@@ -348,8 +341,9 @@ namespace RGR.Views.Shapes {
             return new Point(Margin.Left + m.Left + R2, Margin.Top + m.Top + R2);
         }
 
-
-        // Мозгиы
+        /*
+         * Мозги
+         */
 
         public int[][] GetPinData() => pin_data;
 
@@ -386,7 +380,6 @@ namespace RGR.Views.Shapes {
 
 
         // Экспорт
-
         public abstract int TypeId { get; }
 
         public object Export() {
@@ -453,7 +446,6 @@ namespace RGR.Views.Shapes {
         }
 
         // Для тестирования
-
         public Ellipse SecretGetPin(int n) => pins[n];
     }
 }

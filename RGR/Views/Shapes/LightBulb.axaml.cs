@@ -43,7 +43,7 @@ namespace RGR.Views.Shapes {
         public bool GetState() => state;
 
         /*
-         * Кастомный экспорт и импорт
+         * Экспорт и импорт
          */
 
         public override Dictionary<string, object> ExtraExport() => new() { ["state"] = state };

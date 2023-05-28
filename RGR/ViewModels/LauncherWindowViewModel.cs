@@ -61,5 +61,11 @@ namespace RGR.ViewModels {
             mw.Update();
             me?.Close();
         }
+
+        /*
+         * Для тестирования
+         */
+
+        public static MainWindow GetMW => mw;
     }
 }
