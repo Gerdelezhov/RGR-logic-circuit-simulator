@@ -175,9 +175,9 @@ namespace RGR.ViewModels {
                 break;
             case "Save":
                 map.Export();
-                // Для создания тестов:
-                File.WriteAllText("../../../for_test.json", auxiliary.Obj2json((map.current_scheme ?? throw new System.Exception("Чё?!")).Export()));
-                break;
+                    // Для создания тестов:
+                    // File.WriteAllText("../../../for_test.json", auxiliary.Obj2json((map.current_scheme ?? throw new System.Exception("MainWindowViewModel 179")).Export()));
+                    break;
             case "SaveAs":
                 map.Export();
                 if (mw != null) CurrentProj?.SaveAs(mw);

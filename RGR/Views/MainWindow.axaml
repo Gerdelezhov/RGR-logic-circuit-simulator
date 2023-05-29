@@ -15,12 +15,17 @@
     </Design.DataContext>
 
 	<Window.Styles>
+		<Style Selector="MenuItem">
+			<Setter Property="Background" Value="#343541"/>
+			<Setter Property="Foreground" Value="White"/>
+		</Style>
 		<Style Selector="ListBoxItem">
 			<Setter Property="Padding" Value="0"/>
 		</Style>
 		<Style Selector="Border.b">
+			<Setter Property="Background" Value="#444654"/>
+			<Setter Property="BorderBrush" Value="#0d55f8"/>
 			<Setter Property="BorderThickness" Value="2"/>
-			<Setter Property="BorderBrush" Value="#0d8"/>
 			<Setter Property="CornerRadius" Value="5"/>
 			<Setter Property="Padding" Value="6"/>
 		</Style>
@@ -34,12 +39,12 @@
 	<DockPanel>
 		<Menu DockPanel.Dock="Top" ZIndex="10" Background="#343541">
 			<MenuItem Background="#444654" Header="Файл" Foreground="White">
-				<MenuItem Header="Создать новый проект" Background="#343541" Foreground="White" Command="{Binding Comm}" CommandParameter="Create"/>
-				<MenuItem Header="Открыть проект" Background="#343541" Foreground="White" Command="{Binding Comm}" CommandParameter="Open"/>
-				<MenuItem Header="Сохранить текущую схему" Background="#343541" Foreground="White" Command="{Binding Comm}" CommandParameter="Save" IsEnabled="{Binding CanSave}"/>
-				<MenuItem Header="Сохранить проект как..." Background="#343541" Foreground="White" Command="{Binding Comm}" CommandParameter="SaveAs"/>
-				<MenuItem Header="Выйти в лаунчер" Background="#343541" Foreground="White" Command="{Binding Comm}" CommandParameter="ExitToLauncher"/>
-				<MenuItem Header="Выйти" Background="#343541" Foreground="White" Command="{Binding Comm}" CommandParameter="Exit"/>
+				<MenuItem Header="Создать новый проект"  Command="{Binding Comm}" CommandParameter="Create"/>
+				<MenuItem Header="Открыть проект"  Command="{Binding Comm}" CommandParameter="Open"/>
+				<MenuItem Header="Сохранить текущую схему"  Command="{Binding Comm}" CommandParameter="Save" IsEnabled="{Binding CanSave}"/>
+				<MenuItem Header="Сохранить проект как..."  Command="{Binding Comm}" CommandParameter="SaveAs"/>
+				<MenuItem Header="Выйти в лаунчер"  Command="{Binding Comm}" CommandParameter="ExitToLauncher"/>
+				<MenuItem Header="Выйти"  Command="{Binding Comm}" CommandParameter="Exit"/>
 			</MenuItem>
 		</Menu>
 		<Grid ColumnDefinitions="*,3*,*">
@@ -59,7 +64,7 @@
 				</ListBox.ItemTemplate>
 			</ListBox>
 			<Grid Background="#202123" Grid.Column="2" RowDefinitions="auto,*" DoubleTapped="DTapped">
-				<Border Classes="b" BorderBrush="#0d55f8" Background="#444654">
+				<Border Classes="b">
 					<Grid ColumnDefinitions="*,auto">
 						<TextBlock Background="#444654" Foreground="#b2b2b2" FontSize="16" Tag="p_name" Text="{Binding ProjName}"/>
 						<Button Grid.Column="1" Padding="2" Margin="6 -4 0 -4" Command="{Binding NewItem}">
