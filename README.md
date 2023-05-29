@@ -1,1 +1,1 @@
-# RGR (logic-circuit-simulator) v1.3
+# RGR (logic-circuit-simulator) v1.4
